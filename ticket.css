@@ -1,0 +1,2191 @@
+/* =====================================================================
+   Freshservice — "Ticket Resolver + human decision" ticket interaction.
+
+   Every value in the :root block below is copied verbatim out of the
+   Figma file's published variables (Color/*, Spacing/*, Border-radius/*,
+   the Inter Variable type ramp and the shadow effects), so this stays
+   in lockstep with the design rather than being eyeballed.
+
+   Prefixed `--tv-` / `.tv-` throughout so nothing here collides with
+   the shell's existing tokens in styles.css.
+   ================================================================== */
+
+:root {
+  /* ---- Colour — fills ---------------------------------------- */
+  --tv-fill-surface: #ffffff;              /* Color/Fill/Surface */
+  --tv-fill-container: #f6f7f8;            /* Color/Fill/Container */
+  --tv-fill-brand: #276cf0;                /* Color/Fill/Brand */
+  --tv-fill-info-mildest: #def0ff;         /* Color/Fill/Semantic/Info/Mildest */
+  --tv-fill-highlight: #9561fb;            /* Color/Fill/Semantic/Highlight */
+  --tv-fill-highlight-mildest: #f0ebff;    /* Color/Fill/Semantic/Highlight/Mildest */
+  --tv-fill-success-mildest: #daf3ee;      /* Color/Fill/Semantic/Success/Mildest */
+  --tv-fill-warning-mildest: #feecd5;      /* Color/Fill/Semantic/Warning/Mildest */
+  --tv-soft-pink: #ffc2cb;                 /* Soft Pink — Maya Chen's avatar */
+  --tv-avatar-mc-fg: #8c2f3d;              /* Maya Chen initials (only if the photo fails) */
+  --tv-avatar-hw-bg: #eef1ff;              /* Hannah Watts avatar fill */
+  --tv-avatar-hw-fg: #2c5eff;              /* Hannah Watts avatar initials */
+  --tv-avatar-kw-bg: #0e9384;              /* Knowledge Curator avatar */
+
+  /* ---- Colour — boundaries ----------------------------------- */
+  --tv-border-mildest: #eaeef2;            /* Color/Boundary/Border/Mildest */
+  --tv-border-milder: #dde3e9;             /* Color/Boundary/Border/Milder */
+  --tv-border-brand: #276cf0;              /* Color/Boundary/Brand */
+  --tv-border-info-mild: #c1e2ff;          /* Color/Boundary/Semantic/Info/Mild */
+  --tv-border-highlight: #9561fb;          /* Color/Boundary/Semantic/Highlight */
+  --tv-border-highlight-mild: #ddd0fd;     /* soft purple — Ticket summary card */
+  --tv-border-success-mild: #bde5da;       /* soft green — Resolution note card */
+
+  /* ---- Colour — text ----------------------------------------- */
+  --tv-text-primary: #12334c;              /* Color/Text/Primary */
+  --tv-text-secondary: #485a68;            /* Color/Text/Secondary */
+  --tv-text-placeholder: #8e9dac;          /* Color/Text/Placeholder */
+  --tv-text-brand: #003fd2;                /* Color/Text/Brand */
+  --tv-text-on-brand: #ffffff;             /* Color/Text/On Brand */
+  --tv-text-success: #00795c;              /* Color/Text/Semantic/Success */
+  --tv-text-warning: #ac5000;              /* Color/Text/Semantic/Warning */
+
+  /* ---- Colour — icons ---------------------------------------- */
+  --tv-icon-primary: #2b3640;              /* Color/Icon/Primary */
+  --tv-icon-secondary: #485a68;            /* Color/Icon/Secondary */
+  --tv-icon-selected: #003fd2;             /* Color/Icon/Selected */
+  --tv-icon-disabled: #6f8396;             /* Color/Icon/Disabled */
+  --tv-icon-inverse: #ffffff;              /* Color/Icon/Inverse */
+  --tv-icon-warning: #cf6121;              /* Color/Fill/Semantic/Warning */
+  --tv-icon-danger: #d92d20;               /* matches --color-danger in styles.css */
+  --tv-icon-off: #6f8396;                  /* Color/Fill/Semantic/Off */
+
+  /* ---- Spacing ----------------------------------------------- */
+  --tv-sp-0: 0px;
+  --tv-sp-025: 2px;
+  --tv-sp-050: 4px;
+  --tv-sp-075: 6px;
+  --tv-sp-100: 8px;
+  --tv-sp-150: 12px;
+  --tv-sp-200: 16px;
+  --tv-sp-250: 20px;
+  --tv-sp-300: 24px;
+  --tv-sp-400: 32px;
+  --tv-sp-600: 48px;
+
+  /* ---- Radii -------------------------------------------------- */
+  --tv-r-xs: 4px;
+  --tv-r-sm: 6px;
+  --tv-r-md: 8px;
+  --tv-r-lg: 12px;
+  --tv-r-xl: 16px;
+  --tv-r-circular: 99px;
+
+  /* ---- Shadows ------------------------------------------------ */
+  --tv-shadow-xs: 1px 1px 2px 0 rgba(18, 51, 76, 0.05);
+  --tv-shadow-md: 2px 2px 8px -2px rgba(18, 51, 76, 0.05),
+                  2px 2px 8px -2px rgba(18, 51, 76, 0.1);
+  --tv-shadow-lg: 0 4px 16px 0 rgba(18, 51, 76, 0.1);
+
+  /* ---- Motion ------------------------------------------------- */
+  --tv-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --tv-dur-pane: 320ms;
+  --tv-dur-enter: 260ms;
+
+  /* ---- Fixed pane widths (from the Figma 1368px content row) -- */
+  --tv-list-w: 320px;
+  --tv-thread-w: 360px;
+  --tv-quick-w: 52px;
+}
+
+/* ---------------------------------------------------------------------
+   Type ramp — the four Figma text styles, as reusable helpers
+   ------------------------------------------------------------------ */
+
+.tv-t-headline { font-size: 18px; line-height: 24px; font-weight: 600; letter-spacing: 0; }
+.tv-t-callout  { font-size: 16px; line-height: 24px; font-weight: 600; letter-spacing: 0.02px; }
+.tv-t-body     { font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0.04px; }
+.tv-t-body-m   { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.04px; }
+.tv-t-body-sb  { font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: 0.04px; }
+.tv-t-cap      { font-size: 12px; line-height: 20px; font-weight: 400; letter-spacing: 0.06px; }
+.tv-t-cap-m    { font-size: 12px; line-height: 20px; font-weight: 500; letter-spacing: 0.06px; }
+.tv-t-cap-sb   { font-size: 12px; line-height: 20px; font-weight: 600; letter-spacing: 0.06px; }
+
+/* ---------------------------------------------------------------------
+   Shared primitives — icons, buttons, tags, avatars
+   ------------------------------------------------------------------ */
+
+.tv-i {
+  display: block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--tv-icon-secondary);
+}
+
+/* Secondary (white) button — Resolve, Discuss with AI, comment chip */
+.tv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-075) var(--tv-sp-150);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-xs);
+  color: var(--tv-text-primary);
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 140ms var(--tv-ease), border-color 140ms var(--tv-ease);
+}
+
+.tv-btn:hover { background: #fbfcfd; border-color: var(--tv-border-milder); }
+.tv-btn:active { background: var(--tv-fill-container); }
+
+/* Primary (brand) button — Approve & restore access, Send */
+.tv-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-075) var(--tv-sp-150);
+  border: none;
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-brand);
+  color: var(--tv-text-on-brand);
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 140ms var(--tv-ease), opacity 140ms var(--tv-ease);
+}
+
+.tv-btn-primary:hover { background: #1f5fdb; }
+.tv-btn-primary .tv-i { color: var(--tv-icon-inverse); }
+
+/* 32x32 bordered icon button — star, kebab, attach, format */
+.tv-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-sm);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-xs);
+  cursor: pointer;
+  transition: background 140ms var(--tv-ease);
+}
+
+.tv-iconbtn:hover { background: var(--tv-fill-container); }
+
+/* Borderless icon button — quick menu, thread close */
+.tv-iconbtn-plain {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--tv-r-sm);
+  background: transparent;
+  cursor: pointer;
+  transition: background 140ms var(--tv-ease);
+}
+
+.tv-iconbtn-plain:hover { background: var(--tv-fill-container); }
+
+/* Tag / pill — status badges and the "AI summary" label */
+.tv-tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--tv-sp-075);
+  border-radius: var(--tv-r-xs);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.06px;
+  white-space: nowrap;
+}
+
+.tv-tag-warning   { background: var(--tv-fill-warning-mildest); color: var(--tv-text-warning); }
+.tv-tag-info      { background: var(--tv-fill-info-mildest);    color: var(--tv-text-brand); }
+.tv-tag-success   { background: var(--tv-fill-success-mildest); color: var(--tv-text-success); }
+.tv-tag-highlight { background: var(--tv-fill-highlight-mildest); color: var(--tv-text-secondary); }
+
+/* Avatars ------------------------------------------------------- */
+
+.tv-av {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--tv-r-circular);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04px;
+}
+
+/* Real photos sit inside the same circle; the app badge stays on top. */
+.tv-av img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  display: block;
+}
+
+.tv-av-ai     { background: var(--tv-fill-highlight); color: var(--tv-icon-inverse); }
+.tv-av-ai .tv-i { width: 14px; height: 14px; color: var(--tv-icon-inverse); }
+.tv-av-maya   { background: var(--tv-soft-pink); color: var(--tv-avatar-mc-fg); }
+.tv-av-hannah { background: var(--tv-avatar-hw-bg); color: var(--tv-avatar-hw-fg); }
+.tv-av-lg     { width: 48px; height: 48px; font-size: 16px; line-height: 24px; letter-spacing: 0.02px; }
+/* The 16px avatars inside activity rows are plain colour chips in the
+   design — no initials at that size. */
+.tv-av-sm     { width: 16px; height: 16px; font-size: 0; }
+.tv-av-sm.tv-av-ai .tv-i { width: 10px; height: 10px; }
+
+/* The little app badge that sits on the bottom-right of an avatar.
+   PLACEHOLDER — drop the real 16px export in and point `src` at it;
+   see the note at the top of ticket.js. */
+.tv-av-badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: #e8ecf0;
+  box-shadow: 0 0 0 1.5px var(--tv-fill-surface);
+  background-size: cover;
+  background-position: center;
+}
+
+.tv-av-lg .tv-av-badge {
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+/* Inline app mark used in "made updates in Workday" rows — same
+   placeholder treatment. */
+.tv-appmark {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  background: #e8ecf0;
+  background-size: cover;
+  background-position: center;
+  vertical-align: -3px;
+}
+
+/* ---------------------------------------------------------------------
+   Root layout — toolbar over a four-pane row
+   (320 list + flexible conversation + 360 thread + 52 quick menu,
+   matching the Figma 1368px content row)
+   ------------------------------------------------------------------ */
+
+.tv-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: var(--tv-fill-surface);
+  font-size: 14px;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+}
+
+.tv-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  flex-shrink: 0;
+  padding: 0 var(--tv-sp-200);
+  border-bottom: 1px solid var(--tv-border-mildest);
+}
+
+.tv-viewtoggle { display: flex; align-items: center; gap: var(--tv-sp-100); }
+
+.tv-viewtoggle .tv-iconbtn.is-active {
+  background: var(--tv-fill-info-mildest);
+  border-color: var(--tv-border-info-mild);
+}
+
+.tv-viewtoggle .tv-iconbtn.is-active .tv-i { color: var(--tv-icon-selected); }
+
+/* "Sort by: Urgency ▾" — label + dropdown trigger on one line, after the
+   view toggles. The menu opens below the trigger. */
+.tv-sort {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-050);
+  margin-left: var(--tv-sp-100);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.04px;
+  white-space: nowrap;
+}
+.tv-sort-label { color: var(--tv-text-secondary); }
+.tv-sort-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-025);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-weight: 500;
+  color: var(--tv-text-brand);
+  cursor: pointer;
+  border-radius: var(--tv-r-xs);
+}
+.tv-sort-link:hover span { text-decoration: underline; }
+.tv-sort-link:focus-visible { outline: 2px solid var(--tv-text-brand); outline-offset: 2px; }
+.tv-sort-link .tv-sort-caret { color: var(--tv-text-brand); transition: transform 0.15s ease; }
+.tv-sort-link[aria-expanded="true"] .tv-sort-caret { transform: rotate(180deg); }
+
+.tv-sort-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  min-width: 200px;
+  margin: 0;
+  padding: var(--tv-sp-050);
+  list-style: none;
+  background: var(--tv-fill-surface);
+  border: 1px solid var(--tv-border-milder);
+  border-radius: var(--tv-r-md);
+  box-shadow: var(--tv-shadow-lg);
+}
+.tv-sort-menu:focus { outline: none; }
+.tv-sort-menu li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tv-sp-150);
+  padding: var(--tv-sp-075) var(--tv-sp-100);
+  border-radius: var(--tv-r-xs);
+  color: var(--tv-text-primary);
+  cursor: pointer;
+}
+.tv-sort-menu li:hover,
+.tv-sort-menu li.is-focused { background: var(--tv-fill-container); }
+.tv-sort-menu li .tv-i { visibility: hidden; color: var(--tv-text-brand); }
+.tv-sort-menu li[aria-selected="true"] { color: var(--tv-text-brand); font-weight: 500; }
+.tv-sort-menu li[aria-selected="true"] .tv-i { visibility: visible; }
+
+.tv-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---------------------------------------------------------------------
+   Pane 1 — ticket list (320px)
+   ------------------------------------------------------------------ */
+
+.tv-list {
+  display: flex;
+  flex-direction: column;
+  width: var(--tv-list-w);
+  flex-shrink: 0;
+  min-height: 0;
+  border-right: 1px solid var(--tv-border-mildest);
+}
+
+.tv-list-search { padding: var(--tv-sp-150); flex-shrink: 0; }
+
+.tv-search {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  height: 32px;
+  padding: 0 var(--tv-sp-100);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-xs);
+}
+
+.tv-search input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+}
+
+.tv-search input::placeholder { color: var(--tv-text-placeholder); }
+
+.tv-list-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--tv-sp-100) var(--tv-sp-100);
+}
+
+.tv-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-050);
+  padding: var(--tv-sp-150);
+  border-radius: var(--tv-r-md);
+  cursor: pointer;
+}
+
+.tv-row.is-selected { background: var(--tv-fill-container); }
+.tv-row:not(.is-selected):hover { background: #fbfcfd; }
+
+.tv-row-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+}
+
+.tv-row-dot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tv-icon-off);
+}
+
+.tv-row-dot.is-new { background: var(--tv-icon-warning); }
+.tv-row-sep { color: var(--tv-text-placeholder); }
+.tv-row-time { margin-left: auto; color: var(--tv-text-placeholder); }
+
+.tv-row-title {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tv-row-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+}
+
+.tv-row-prev {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-placeholder);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tv-row-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tv-fill-brand);
+  color: var(--tv-text-on-brand);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------
+   Pane 2 — conversation
+   ------------------------------------------------------------------ */
+
+.tv-conv {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Ticket header + tabs, with the drop shadow the design puts under it */
+.tv-conv-head {
+  flex-shrink: 0;
+  background: var(--tv-fill-surface);
+  box-shadow: 0 4px 8px rgba(18, 51, 76, 0.1);
+  position: relative;
+  z-index: 2;
+}
+
+.tv-ticket-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tv-sp-200);
+  min-height: 52px;
+  padding: var(--tv-sp-300);
+}
+
+.tv-ticket-id {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--tv-sp-150);
+  min-width: 0;
+}
+
+.tv-ticket-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  height: 48px;
+}
+
+.tv-ticket-crumbs {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  padding-top: var(--tv-sp-025);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+}
+
+.tv-ticket-crumbs .tv-row-sep { color: var(--tv-text-placeholder); }
+
+.tv-ticket-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--tv-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tv-ticket-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  flex-shrink: 0;
+}
+
+/* Tabs ---------------------------------------------------------- */
+
+.tv-tabs {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tv-sp-300);
+  padding: var(--tv-sp-100) var(--tv-sp-400) 0;
+  border-bottom: 1px solid var(--tv-border-mildest);
+  background: var(--tv-fill-surface);
+  overflow: hidden;
+}
+
+.tv-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tv-sp-100);
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tv-tab-label {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-050);
+  padding: 0 var(--tv-sp-100);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-secondary);
+  white-space: nowrap;
+}
+
+.tv-tab-underline {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: transparent;
+}
+
+.tv-tab.is-active .tv-tab-label { color: var(--tv-text-brand); }
+.tv-tab.is-active .tv-tab-underline { background: var(--tv-border-brand); }
+.tv-tab-label .tv-i { width: 14px; height: 14px; }
+
+/* When the thread panel is open the pane narrows to 636px, so the last
+   three tabs fold into a "More" dropdown — exactly as in frames 2-6. */
+.tv-tab-more { display: none; }
+.tv-root.is-thread-open .tv-tab-overflow { display: none; }
+.tv-root.is-thread-open .tv-tab-more { display: flex; }
+
+/* Conversation scroller ----------------------------------------- */
+
+.tv-conv-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--tv-sp-300) var(--tv-sp-300) var(--tv-sp-100);
+}
+
+.tv-conv-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-250);
+  align-items: stretch;
+}
+
+/* Message bubbles ----------------------------------------------- */
+
+.tv-msg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-200);
+  border-radius: var(--tv-r-xl);
+  border: 1px solid transparent;
+}
+
+.tv-msg.is-ai    { background: var(--tv-fill-container); }
+.tv-msg.is-human { background: var(--tv-fill-surface); border-color: var(--tv-border-milder); }
+
+.tv-msg-head {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+}
+
+.tv-msg-name {
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+}
+
+.tv-msg-time {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-placeholder);
+}
+
+.tv-msg-body {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+}
+
+.tv-msg-body p { margin: 0; }
+.tv-msg-body ul,
+.tv-msg-body ol { margin: 0; padding-left: 20px; }
+.tv-msg-body ol { padding-left: 22px; }
+.tv-msg-body ul { list-style: none; padding-left: 0; }
+
+/* The design separates paragraphs and lists with one blank line. */
+.tv-msg-body p + p,
+.tv-msg-body p + ul,
+.tv-msg-body p + ol,
+.tv-msg-body ul + p,
+.tv-msg-body ol + p { margin-top: 20px; }
+.tv-msg-body a,
+.tv-msg-body .tv-link {
+  color: var(--tv-text-brand);
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+}
+.tv-msg-body .tv-link-plain {
+  color: var(--tv-text-primary);
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+.tv-msg-body strong { font-weight: 600; }
+
+/* Activity rows ------------------------------------------------- */
+
+/* Figma sets every part of an activity row in Text/Secondary — the only
+   difference between the subject and the connecting words is the weight. */
+.tv-act {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tv-sp-075);
+  min-height: 20px;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+}
+
+.tv-act > .tv-i { margin-top: 2px; color: var(--tv-icon-secondary); }
+
+/* The text is one continuous inline run rather than a row of flex items,
+   so the words sit at natural sentence spacing and wrap properly. */
+.tv-act-text { min-width: 0; }
+.tv-act strong { font-weight: 600; }
+.tv-act .tv-av { display: inline-flex; vertical-align: top; margin: 2px 1px 0; }
+
+/* AI summary card ----------------------------------------------- */
+
+.tv-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-200);
+  padding: var(--tv-sp-200);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-xl);
+  background: var(--tv-fill-surface);
+}
+
+/* Author row + title, kept tighter together than the card's 16px rhythm. */
+.tv-card-top { display: flex; flex-direction: column; gap: var(--tv-sp-100); }
+
+.tv-card-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--tv-sp-050);
+  justify-content: center;
+}
+
+/* The header stacks everywhere: tag on one line, title on the next.
+   (The conversation pane used to put both on one line.) */
+
+.tv-card-title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0.02px;
+  color: var(--tv-text-primary);
+}
+
+.tv-card-time {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-placeholder);
+}
+
+.tv-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-200);
+}
+
+.tv-card-sec { display: flex; flex-direction: column; gap: var(--tv-sp-100); }
+
+.tv-card-sec h4 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+}
+
+.tv-card-sec p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+}
+
+.tv-card-sec a,
+.tv-card-sec .tv-link {
+  color: var(--tv-text-brand);
+  text-decoration: underline;
+  text-underline-position: from-font;
+  cursor: pointer;
+}
+
+.tv-card-sec strong { font-weight: 600; }
+
+/* Bleeds past the card's own padding to the card's outer edges — a very
+   mild grey fill stands in for a border, separating the footer (ask box,
+   comment chip, or approved chip) from the summary content above it. */
+.tv-card-foot {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tv-sp-100);
+  min-height: 32px;
+  margin: 0 calc(-1 * var(--tv-sp-200)) calc(-1 * var(--tv-sp-200));
+  padding: var(--tv-sp-150) var(--tv-sp-200) var(--tv-sp-200);
+  background: var(--tv-fill-container);
+  border-radius: 0 0 var(--tv-r-xl) var(--tv-r-xl);
+}
+
+/* The comment chip that replaces the two action buttons once the agent
+   has started a thread (frames 3-6). */
+.tv-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-075) var(--tv-sp-150);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-xs);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-secondary);
+  cursor: pointer;
+}
+
+.tv-chip:hover { background: var(--tv-fill-container); }
+
+/* Thread participant indicator — a text link, not a button, so it stays
+   light next to Approve. Avatars force-clipped to a circle (the agent
+   marks are square PNGs by default) and ringed in the footer band's own
+   colour rather than white, so the stack doesn't look like a rendering
+   glitch sitting on the grey band. */
+.tv-chip-thread {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  color: var(--tv-text-secondary);
+}
+.tv-chip-thread:hover { background: none; }
+.tv-chip-thread:hover .tv-chip-count { text-decoration: underline; }
+
+.tv-chip-avatars {
+  display: flex;
+  align-items: center;
+}
+.tv-chip-avatars .tv-av {
+  border-radius: 50%;
+  overflow: hidden;
+  margin-left: -6px;
+  box-shadow: 0 0 0 2px var(--tv-fill-container);
+  background-size: cover;
+}
+.tv-chip-avatars .tv-av:first-child { margin-left: 0; }
+.tv-chip-count { white-space: nowrap; }
+.tv-chip-chevron { transform: rotate(-90deg); margin-left: -5px; }
+
+/* Composer ------------------------------------------------------ */
+
+.tv-composer-wrap { flex-shrink: 0; padding: var(--tv-sp-200) var(--tv-sp-300); }
+
+.tv-composer {
+  display: flex;
+  flex-direction: column;
+  height: 140px;
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-lg);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-lg);
+  overflow: hidden;
+}
+
+.tv-composer-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-050);
+  padding: var(--tv-sp-100) var(--tv-sp-150) 0;
+  flex-shrink: 0;
+}
+
+.tv-seg {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-200);
+  min-height: 40px;
+  padding: var(--tv-sp-050);
+  border-radius: var(--tv-r-md);
+}
+
+.tv-seg-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: var(--tv-sp-025) var(--tv-sp-150);
+  border: 1px solid transparent;
+  border-radius: var(--tv-r-sm);
+  background: var(--tv-fill-surface);
+  font: inherit;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-primary);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tv-seg-tab.is-active {
+  height: 34.67px;
+  border-color: var(--tv-border-info-mild);
+  background: var(--tv-fill-info-mildest);
+  color: var(--tv-text-brand);
+  font-weight: 600;
+}
+
+.tv-composer-area {
+  flex: 1;
+  min-height: 0;
+  /* The Figma text area is 39.33px tall with the first line at y=12, so
+     the bottom padding has to be tighter than the top. */
+  padding: 10px var(--tv-sp-200) 8px;
+  overflow: hidden;
+}
+
+.tv-composer-area textarea {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-primary);
+}
+
+.tv-composer-area textarea::placeholder { color: var(--tv-text-placeholder); }
+
+.tv-composer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: var(--tv-sp-100) var(--tv-sp-150);
+}
+
+.tv-composer-foot-left { display: flex; align-items: center; gap: var(--tv-sp-025); }
+
+/* ---------------------------------------------------------------------
+   Pane 3 — thread panel (360px, slides in)
+   ------------------------------------------------------------------ */
+
+.tv-thread {
+  position: relative;
+  width: 0;
+  flex-shrink: 0;
+  min-height: 0;
+  border-left: 0 solid var(--tv-border-mildest);
+  overflow: hidden;
+  transition: width var(--tv-dur-pane) var(--tv-ease),
+              border-left-width var(--tv-dur-pane) var(--tv-ease);
+}
+
+.tv-root.is-thread-open .tv-thread {
+  width: var(--tv-thread-w);
+  border-left-width: 1px;
+}
+
+.tv-thread-inner {
+  display: flex;
+  flex-direction: column;
+  width: var(--tv-thread-w);
+  height: 100%;
+  min-height: 0;
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 240ms var(--tv-ease) 60ms,
+              transform 300ms var(--tv-ease) 40ms;
+}
+
+.tv-root.is-thread-open .tv-thread-inner { opacity: 1; transform: none; }
+
+.tv-thread-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  flex-shrink: 0;
+  padding: 0 var(--tv-sp-200);
+  background: var(--tv-fill-surface);
+  box-shadow: none;
+  position: relative;
+  z-index: 2;
+  transition: box-shadow 160ms var(--tv-ease);
+}
+/* Only casts a shadow once the thread's content has actually scrolled
+   underneath it — toggled by tvThreadScroll's scroll listener. */
+.tv-thread-head.is-scrolled { box-shadow: var(--tv-shadow-md); }
+
+.tv-thread-head h3 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--tv-text-primary);
+}
+
+.tv-thread-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--tv-sp-300) var(--tv-sp-200) var(--tv-sp-100);
+}
+
+.tv-thread-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-250);
+}
+
+.tv-thread-list .tv-card { border-color: var(--tv-border-highlight); }
+
+/* Avatars in the thread panel carry no app badge in the design. */
+.tv-thread-list .tv-av-badge { display: none; }
+
+.tv-thread-composer-wrap { flex-shrink: 0; padding: var(--tv-sp-200); }
+
+.tv-thread-composer {
+  display: flex;
+  flex-direction: column;
+  height: 120px;
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-lg);
+  background: var(--tv-fill-surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  cursor: text;
+}
+
+.tv-thread-composer .tv-composer-foot { justify-content: flex-end; }
+
+.tv-send-sq {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-brand);
+  cursor: pointer;
+  transition: background 140ms var(--tv-ease);
+}
+
+.tv-send-sq:hover { background: #1f5fdb; }
+.tv-send-sq .tv-i { color: var(--tv-icon-inverse); }
+.tv-send-sq:disabled { opacity: 0.45; cursor: default; }
+.tv-send-sq:disabled:hover { background: var(--tv-fill-brand); }
+
+/* ---------------------------------------------------------------------
+   Pane 4 — quick menu (52px)
+   ------------------------------------------------------------------ */
+
+.tv-quick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  width: var(--tv-quick-w);
+  flex-shrink: 0;
+  padding: var(--tv-sp-200) 0;
+  border-left: 1px solid var(--tv-border-mildest);
+}
+
+/* ---------------------------------------------------------------------
+   Motion
+   ------------------------------------------------------------------ */
+
+/* Every message / activity row that arrives after load rises into place */
+.tv-enter {
+  animation: tv-enter var(--tv-dur-enter) var(--tv-ease) both;
+}
+
+@keyframes tv-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Cross-fade used by the status badge and the card footer swap */
+.tv-swap { animation: tv-swap 220ms var(--tv-ease) both; }
+
+@keyframes tv-swap {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* "Ticket Resolver is typing" — three bouncing dots inside a real bubble */
+.tv-typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 20px;
+}
+
+.tv-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tv-icon-disabled);
+  animation: tv-bounce 1.15s var(--tv-ease) infinite;
+}
+
+.tv-typing span:nth-child(2) { animation-delay: 0.16s; }
+.tv-typing span:nth-child(3) { animation-delay: 0.32s; }
+
+@keyframes tv-bounce {
+  0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+  30%           { opacity: 1;    transform: translateY(-3px); }
+}
+
+/* The caret that blinks while a message is being auto-typed */
+.tv-caret {
+  display: inline-block;
+  width: 1px;
+  height: 14px;
+  margin-left: 1px;
+  background: var(--tv-text-primary);
+  vertical-align: -2px;
+  animation: tv-blink 1s step-end infinite;
+}
+
+@keyframes tv-blink { 50% { opacity: 0; } }
+
+/* ---------------------------------------------------------------------
+   Demo control — deliberately quiet, not part of the design.
+   Press R to restart the flow, or hover the bottom-left corner.
+   ------------------------------------------------------------------ */
+
+.tv-restart {
+  position: fixed;
+  right: 14px;
+  bottom: 10px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-circular);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-xs);
+  color: var(--tv-text-secondary);
+  opacity: 0.22;
+  cursor: pointer;
+  transition: opacity 180ms var(--tv-ease);
+}
+
+.tv-restart:hover { opacity: 1; }
+.tv-restart .tv-i { width: 13px; height: 13px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-thread,
+  .tv-thread-inner,
+  .tv-enter,
+  .tv-swap { transition: none !important; animation: none !important; }
+  .tv-typing span { animation: none; }
+}
+
+/* =====================================================================
+   AGENT STATES
+   Adapted from Beautiful UI (beautifului.dev) — loading state, thinking
+   traces, streaming text, task rows and context cards — restyled onto
+   this file's Dew tokens so they sit inside a Freshservice conversation
+   rather than looking bolted on.
+   ================================================================== */
+
+/* ---------------------------------------------------------------------
+   01 — Loading state: pixel grid + shimmering label + elapsed time
+   ------------------------------------------------------------------ */
+
+.tv-loader {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  height: 20px;
+}
+
+.tv-loader-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 2px);
+  grid-auto-rows: 2px;
+  gap: 1.5px;
+  flex-shrink: 0;
+}
+
+.tv-loader-grid i {
+  display: block;
+  width: 2px;
+  height: 2px;
+  border-radius: 0.5px;
+  background: var(--tv-icon-disabled);
+  animation: tv-pixel 1.25s var(--tv-ease) infinite;
+}
+
+/* Walk the pulse across the grid so it reads as motion, not a blink. */
+.tv-loader-grid i:nth-child(1) { animation-delay: 0ms; }
+.tv-loader-grid i:nth-child(2) { animation-delay: 70ms; }
+.tv-loader-grid i:nth-child(3) { animation-delay: 140ms; }
+.tv-loader-grid i:nth-child(4) { animation-delay: 70ms; }
+.tv-loader-grid i:nth-child(5) { animation-delay: 140ms; }
+.tv-loader-grid i:nth-child(6) { animation-delay: 210ms; }
+.tv-loader-grid i:nth-child(7) { animation-delay: 140ms; }
+.tv-loader-grid i:nth-child(8) { animation-delay: 210ms; }
+.tv-loader-grid i:nth-child(9) { animation-delay: 280ms; }
+
+@keyframes tv-pixel {
+  0%, 100% { opacity: 0.25; }
+  40%      { opacity: 1; }
+}
+
+.tv-loader-label {
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.06px;
+  white-space: nowrap;
+  background: linear-gradient(90deg,
+    var(--tv-text-placeholder) 0%,
+    var(--tv-text-placeholder) 38%,
+    var(--tv-text-primary) 50%,
+    var(--tv-text-placeholder) 62%,
+    var(--tv-text-placeholder) 100%);
+  background-size: 260% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: tv-shimmer 1.9s linear infinite;
+}
+
+@keyframes tv-shimmer {
+  from { background-position: 160% 0; }
+  to   { background-position: -60% 0; }
+}
+
+.tv-loader-time {
+  font-size: 11px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+  color: var(--tv-text-placeholder);
+  font-feature-settings: "tnum";
+}
+
+/* ---------------------------------------------------------------------
+   02 — Thinking trace: collapsed pill that opens into reasoning or steps
+   ------------------------------------------------------------------ */
+
+.tv-trace { display: flex; flex-direction: column; align-items: flex-start; gap: var(--tv-sp-100); }
+
+.tv-trace-head {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-075);
+  padding: 2px var(--tv-sp-100) 2px var(--tv-sp-075);
+  margin-left: -6px;
+  border: none;
+  border-radius: var(--tv-r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+  cursor: pointer;
+  transition: background 140ms var(--tv-ease);
+}
+
+.tv-trace-head:hover { background: var(--tv-fill-container); }
+.tv-trace-head .tv-i { width: 16px; height: 16px; color: var(--tv-icon-secondary); }
+.tv-trace-head .tv-trace-caret { transition: transform 200ms var(--tv-ease); }
+.tv-trace.is-open .tv-trace-caret { transform: rotate(180deg); }
+
+.tv-trace-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  margin-left: 6px;
+  transition: grid-template-rows 260ms var(--tv-ease);
+}
+
+.tv-trace.is-open .tv-trace-body { grid-template-rows: 1fr; }
+.tv-trace-body > div { min-height: 0; overflow: hidden; }
+
+/* Reasoning variant — muted first-person notes behind a hairline rule */
+.tv-trace-reason {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-050) 0 var(--tv-sp-050) var(--tv-sp-150);
+  border-left: 1px solid var(--tv-border-milder);
+}
+
+.tv-trace-reason p {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+}
+
+/* Steps variant — what the agent actually did, with the tool it used */
+.tv-trace-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-050);
+  margin: 0;
+  padding: var(--tv-sp-050) 0 var(--tv-sp-050) var(--tv-sp-150);
+  list-style: none;
+  border-left: 1px solid var(--tv-border-milder);
+}
+
+.tv-trace-steps li {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-075);
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+}
+
+.tv-trace-steps .tv-i { width: 12px; height: 12px; color: var(--tv-text-success); }
+
+.tv-trace-steps code {
+  padding: 0 var(--tv-sp-075);
+  border-radius: var(--tv-r-xs);
+  background: var(--tv-fill-container);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--tv-text-placeholder);
+}
+
+/* ---------------------------------------------------------------------
+   03 — Streaming text: block caret that rides the end of the stream
+   ------------------------------------------------------------------ */
+
+.tv-stream-caret {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  margin-left: 2px;
+  border-radius: 1px;
+  background: var(--tv-text-primary);
+  vertical-align: -2px;
+  animation: tv-blink 1s step-end infinite;
+}
+
+/* ---------------------------------------------------------------------
+   06 — Task rows: live capsules, running -> completed
+   ------------------------------------------------------------------ */
+
+.tv-tasks { display: flex; flex-direction: column; gap: var(--tv-sp-100); }
+
+/* The task pills themselves, stacked with a gap so they don't touch. */
+.tv-tasks-rows { display: flex; flex-direction: column; gap: var(--tv-sp-100); }
+
+.tv-task {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-075) var(--tv-sp-150) var(--tv-sp-075) var(--tv-sp-100);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-circular);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-xs);
+  transition: border-color 200ms var(--tv-ease), opacity 200ms var(--tv-ease);
+}
+
+.tv-task.is-pending { opacity: 0.55; }
+.tv-task.is-running { border-color: var(--tv-border-info-mild); }
+
+.tv-task-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--tv-fill-container);
+  color: var(--tv-text-placeholder);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tv-task.is-done .tv-task-badge { background: var(--tv-text-success); color: var(--tv-icon-inverse); }
+.tv-task.is-done .tv-task-badge .tv-i { width: 12px; height: 12px; color: var(--tv-icon-inverse); }
+
+.tv-task-name {
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-primary);
+  white-space: nowrap;
+}
+
+.tv-task-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-050);
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-placeholder);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tv-task-pill {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  flex-shrink: 0;
+  padding: 0 var(--tv-sp-075);
+  border-radius: var(--tv-r-xs);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06px;
+  white-space: nowrap;
+  background: var(--tv-fill-container);
+  color: var(--tv-text-placeholder);
+}
+
+.tv-task.is-done .tv-task-pill {
+  background: var(--tv-fill-success-mildest);
+  color: var(--tv-text-success);
+}
+
+.tv-task.is-running .tv-task-pill { background: transparent; padding: 0; }
+
+/* ---------------------------------------------------------------------
+   10 — Context cards: the retrieved policy chunks behind the citation
+   ------------------------------------------------------------------ */
+
+.tv-ctx-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-075);
+  padding: 2px var(--tv-sp-100) 2px var(--tv-sp-075);
+  margin-left: -6px;
+  border: none;
+  border-radius: var(--tv-r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+  cursor: pointer;
+}
+
+.tv-ctx-toggle:hover { background: var(--tv-fill-container); }
+.tv-ctx-toggle .tv-i { width: 16px; height: 16px; color: var(--tv-icon-secondary); }
+.tv-ctx-toggle .tv-trace-caret { transition: transform 200ms var(--tv-ease); }
+.tv-ctx.is-open .tv-ctx-toggle .tv-trace-caret { transform: rotate(180deg); }
+
+.tv-ctx { display: flex; flex-direction: column; align-items: flex-start; gap: var(--tv-sp-100); }
+
+.tv-ctx-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: 100%;
+  overflow: hidden;
+  transition: grid-template-rows 260ms var(--tv-ease);
+}
+
+.tv-ctx.is-open .tv-ctx-body { grid-template-rows: 1fr; }
+.tv-ctx-body > div { min-height: 0; overflow: hidden; }
+
+.tv-ctx-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-050) 0;
+}
+
+.tv-ctx-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-075);
+  padding: var(--tv-sp-150);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-container);
+}
+
+.tv-ctx-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-075);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-primary);
+}
+
+.tv-ctx-card-head .tv-i { width: 16px; height: 16px; color: var(--tv-icon-secondary); }
+.tv-ctx-card-head span { margin-left: auto; font-weight: 400; color: var(--tv-text-placeholder); }
+
+.tv-ctx-card p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+}
+
+.tv-ctx-src {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-075);
+  align-self: flex-start;
+  padding: 1px var(--tv-sp-100) 1px var(--tv-sp-050);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-xs);
+  background: var(--tv-fill-surface);
+  font-size: 11px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-secondary);
+}
+
+.tv-ctx-src b {
+  padding: 0 4px;
+  border-radius: 2px;
+  background: var(--tv-fill-container);
+  color: var(--tv-text-secondary);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.tv-ctx-src b.is-doc { background: var(--tv-fill-container); color: var(--tv-text-secondary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-loader-grid i,
+  .tv-loader-label,
+  .tv-stream-caret { animation: none !important; }
+  .tv-loader-label { color: var(--tv-text-secondary); -webkit-text-fill-color: currentColor; }
+  .tv-trace-body,
+  .tv-ctx-body { transition: none !important; }
+}
+
+/* ---------------------------------------------------------------------
+   Card footer — the "Discuss" field is borderless: the grey footer band
+   (.tv-card-foot) is what separates it from "N sources" above, so the
+   field itself carries no border or background of its own. The send
+   button sits beside the textarea (not on its own row below), pinned to
+   the bottom-right so the textarea's two lines can grow above it.
+   ------------------------------------------------------------------ */
+.tv-ask {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--tv-sp-100);
+  cursor: text;
+}
+.tv-ask textarea {
+  flex: 1;
+  min-width: 0;
+  /* Fixed to two lines — a third line scrolls inside the box rather than
+     growing it. */
+  height: 40px;
+  padding: 0;
+  border: 0;
+  outline: none;
+  resize: none;
+  overflow-y: auto;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+}
+.tv-ask textarea::placeholder { color: var(--tv-text-placeholder); }
+
+/* "Ask AI" — same secondary-button style as Resolve (.tv-btn): white
+   fill, hairline border, soft shadow, dark text — not a text link. */
+.tv-ask-send {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-075) var(--tv-sp-150);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-xs);
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 140ms var(--tv-ease), border-color 140ms var(--tv-ease);
+}
+.tv-ask-send:hover:not(:disabled) { background: #fbfcfd; border-color: var(--tv-border-milder); }
+.tv-ask-send:active:not(:disabled) { background: var(--tv-fill-container); }
+.tv-ask-send:focus-visible { outline: 2px solid var(--tv-text-brand); outline-offset: 1px; }
+.tv-ask-send:disabled { color: var(--tv-text-placeholder); background: var(--tv-fill-surface); border-color: var(--tv-border-mildest); box-shadow: none; cursor: default; }
+
+/* Approve button now sits directly under the Action question, not in the
+   footer — hidden once Maya approves or opens a discussion instead. */
+.tv-card-approve-row { margin-top: var(--tv-sp-100); }
+.tv-card-approve-row[hidden] { display: none; }
+
+/* ---------------------------------------------------------------------
+   Resolution note — same anatomy as the AI summary card, plus an Edit
+   button in the author row. In edit mode the body becomes a rich-text
+   field (brand border + soft ring) with Save / Cancel underneath.
+   ------------------------------------------------------------------ */
+.tv-card-author .tv-note-edit { margin-left: auto; }
+.tv-note-edited {
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-placeholder);
+}
+
+.tv-btn-sm { padding: var(--tv-sp-025) var(--tv-sp-100); gap: var(--tv-sp-050); }
+.tv-btn-sm .tv-i { width: 14px; height: 14px; }
+
+.tv-note-body ol { margin: 0; padding-left: 22px; }
+.tv-note-body li {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.04px;
+  color: var(--tv-text-primary);
+}
+.tv-note-body li + li { margin-top: var(--tv-sp-050); }
+
+.tv-note-body {
+  margin: 0 calc(-1 * var(--tv-sp-100) - 1px) calc(-1 * var(--tv-sp-100) - 1px);
+  padding: var(--tv-sp-100);
+  border: 1px solid transparent;
+  border-radius: var(--tv-r-md);
+  transition: border-color 140ms var(--tv-ease), box-shadow 140ms var(--tv-ease);
+}
+.tv-note.is-editing .tv-note-body {
+  border-color: var(--tv-border-brand);
+  box-shadow: 0 0 0 3px var(--tv-fill-info-mildest);
+  outline: none;
+  cursor: text;
+}
+
+/* Buttons and the footer set their own display, so make [hidden] win. */
+.tv-note [hidden] { display: none !important; }
+
+/* Private tags (Ticket summary, Resolution note): a lock before the label
+   says the requester never sees this — only agents do. The icon takes
+   the tag's own text colour. */
+.tv-tag-private { gap: var(--tv-sp-050); cursor: default; }
+.tv-tag-private .tv-i { width: 12px; height: 12px; color: currentColor; }
+
+/* Visually hidden, still read by screen readers. Its parents are
+   position: relative so this absolutely-positioned 1px box stays inside
+   them — otherwise it escapes the scroll panes and makes the whole page
+   taller than the window. */
+.tv-tag-private,
+.tv-row-check { position: relative; }
+.tv-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* The note's title lives inside the editable body, so pull the body up
+   under the tag: title sits ~13px below it, and the edit outline clears it. */
+.tv-note .tv-card-top { margin-bottom: -12px; }
+
+/* ---------------------------------------------------------------------
+   Trace row with a link — "Knowledge Curator proposed an update to
+   [Extended Leave Access Policy ↗] ⌄"
+   ------------------------------------------------------------------ */
+.tv-trace-row { display: flex; align-items: center; flex-wrap: wrap; }
+.tv-trace-row .tv-trace-head { padding-right: var(--tv-sp-050); }
+.tv-trace-row .tv-trace-caret-btn { margin-left: 0; padding: 2px var(--tv-sp-050); }
+.tv-trace-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: 0.06px;
+  color: var(--tv-text-brand);
+  text-decoration: none;
+  border-radius: var(--tv-r-xs);
+}
+.tv-trace-link:hover { text-decoration: underline; }
+.tv-trace-link:focus-visible { outline: 2px solid var(--tv-text-brand); outline-offset: 2px; }
+.tv-trace-link .tv-i { width: 12px; height: 12px; color: currentColor; }
+
+/* ---------------------------------------------------------------------
+   Policy page — side sheet from the right over a dimmed app
+   ------------------------------------------------------------------ */
+.tv-policy { position: fixed; inset: 0; z-index: 100; }
+.tv-policy[hidden] { display: none; }
+.tv-policy-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 51, 76, 0.28);
+  opacity: 0;
+  transition: opacity 200ms var(--tv-ease);
+}
+.tv-policy-sheet {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(640px, 100%);
+  background: var(--tv-fill-surface);
+  box-shadow: -8px 0 32px rgba(18, 51, 76, 0.16);
+  transform: translateX(24px);
+  opacity: 0;
+  transition: transform 220ms var(--tv-ease), opacity 220ms var(--tv-ease);
+  outline: none;
+}
+.tv-policy.is-open .tv-policy-scrim { opacity: 1; }
+.tv-policy.is-open .tv-policy-sheet { transform: none; opacity: 1; }
+
+.tv-policy-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  flex-shrink: 0;
+  padding: 0 var(--tv-sp-200) 0 var(--tv-sp-300);
+  border-bottom: 1px solid var(--tv-border-mildest);
+}
+.tv-policy-crumbs { font-size: 12px; line-height: 20px; color: var(--tv-text-secondary); }
+
+.tv-policy-scroll { flex: 1; overflow-y: auto; padding: var(--tv-sp-300); }
+.tv-policy-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--tv-text-primary);
+}
+.tv-policy-meta {
+  margin: var(--tv-sp-050) 0 0;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--tv-text-placeholder);
+}
+
+.tv-policy-banner {
+  display: flex;
+  gap: var(--tv-sp-100);
+  margin-top: var(--tv-sp-200);
+  padding: var(--tv-sp-150);
+  border: 1px solid var(--tv-border-info-mild);
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-info-mildest);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--tv-text-primary);
+}
+.tv-policy-banner .tv-i { margin-top: 2px; color: var(--tv-text-brand); }
+
+.tv-policy-doc { margin-top: var(--tv-sp-300); max-width: 68ch; }
+.tv-policy-doc h3 {
+  margin: var(--tv-sp-300) 0 var(--tv-sp-100);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--tv-text-primary);
+}
+.tv-policy-doc h3:first-child { margin-top: 0; }
+.tv-policy-doc p {
+  margin: 0 0 var(--tv-sp-100);
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--tv-text-primary);
+}
+.tv-policy-doc b { font-weight: 600; }
+
+/* The proposed addition — green insert bar, like a tracked change */
+.tv-policy-add {
+  margin-top: var(--tv-sp-200);
+  padding: var(--tv-sp-150) var(--tv-sp-200);
+  border-left: 3px solid var(--tv-text-success);
+  border-radius: 0 var(--tv-r-md) var(--tv-r-md) 0;
+  background: var(--tv-fill-success-mildest);
+}
+.tv-policy-add-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-050);
+  margin-bottom: var(--tv-sp-100);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--tv-text-success);
+}
+.tv-policy-add-tag .tv-i { width: 13px; height: 13px; color: currentColor; }
+.tv-policy-add p:last-child { margin-bottom: 0; }
+.tv-policy-add .tv-policy-why { font-size: 13px; color: var(--tv-text-secondary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-policy-scrim, .tv-policy-sheet { transition: none; }
+}
+
+/* ---------------------------------------------------------------------
+   Resolved state for a ticket card in the list (check replaces the dot)
+   ------------------------------------------------------------------ */
+/* Solid green circle with a white tick, in place of the "new" dot. One
+   12px SVG (circle + tick) so the tick is centred optically, not just by box. */
+.tv-row-check { display: none; width: 12px; height: 12px; margin: 0 -3px; flex-shrink: 0; }
+.tv-row-check svg { display: block; width: 12px; height: 12px; }
+.tv-row-check circle { fill: var(--tv-text-success); }
+.tv-row-check path {
+  fill: none;
+  stroke: var(--tv-icon-inverse);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tv-row.is-resolved .tv-row-dot { display: none; }
+.tv-row.is-resolved .tv-row-check { display: inline-flex; }
+.tv-row.is-resolved .tv-row-title { color: var(--tv-text-secondary); font-weight: 500; }
+.tv-row.is-resolved .tv-row-prev { color: var(--tv-text-placeholder); }
+
+/* Composer tools (formatting, attach) — borderless like Gmail/Notion:
+   no box at rest, a soft fill on hover, 18px glyphs. */
+.tv-iconbtn.tv-iconbtn-ghost {
+  width: 32px;
+  height: 32px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.tv-iconbtn.tv-iconbtn-ghost:hover { background: var(--tv-fill-container); }
+.tv-iconbtn.tv-iconbtn-ghost .tv-i {
+  width: 18px;
+  height: 18px;
+  color: var(--tv-icon-disabled);   /* quiet at rest, 4:1 on white (passes WCAG 3:1 for controls) */
+  transition: color 140ms var(--tv-ease);
+}
+.tv-iconbtn.tv-iconbtn-ghost:hover .tv-i,
+.tv-iconbtn.tv-iconbtn-ghost:focus-visible .tv-i { color: var(--tv-icon-secondary); }
+
+/* Knowledge Curator avatar — teal chip with the knowledge-update glyph,
+   so it reads as a different Ticket Resolver from the purple one. */
+.tv-av-kw { background: var(--tv-avatar-kw-bg); color: var(--tv-icon-inverse); }
+.tv-av-kw .tv-i { width: 14px; height: 14px; color: var(--tv-icon-inverse); }
+.tv-av-sm.tv-av-kw .tv-i { width: 10px; height: 10px; }
+
+/* "Approved by Maya Chen" chip — circled tick in success green. */
+.tv-chip-approved { cursor: default; }
+.tv-chip-approved:hover { background: var(--tv-fill-surface); }
+.tv-chip-approved .tv-i { color: var(--tv-text-success); }
+
+/* Policy mentions are live links to the policy page. */
+[data-policy] { cursor: pointer; }
+[data-policy]:focus-visible { outline: 2px solid var(--tv-text-brand); outline-offset: 2px; border-radius: 2px; }
+[contenteditable="true"] [data-policy] { cursor: text; }
+
+/* Card borders pick up their tag's colour, softly: purple for the
+   Ticket summary, green for the Resolution note. (The pinned copy in the
+   Thread panel keeps its stronger purple border.) */
+.tv-conv-list .tv-card { border-color: var(--tv-border-highlight-mild); }
+.tv-conv-list .tv-card.tv-note { border-color: var(--tv-border-success-mild); }
+
+/* The Knowledge Curator row reads like the other activity rows: the actor
+   in semibold, the rest of the sentence at regular weight. */
+.tv-trace-row .tv-trace-head { font-weight: 400; }
+.tv-trace-row .tv-trace-head strong { font-weight: 600; }
+
+/* =====================================================================
+   Board (Kanban) view — replaces the four panes when "Board view" is on
+   ================================================================== */
+.tv-root.is-board .tv-body { display: none; }
+.tv-board[hidden] { display: none; }
+
+.tv-board {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  gap: var(--tv-sp-150);
+  padding: var(--tv-sp-200);
+  overflow-x: auto;
+  background: var(--tv-fill-surface);
+}
+
+.tv-bcol {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 280px;
+  max-width: 360px;
+  min-height: 0;
+  border-radius: var(--tv-r-lg);
+  background: var(--tv-fill-container);
+}
+
+.tv-bcol-head {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-150) var(--tv-sp-150) var(--tv-sp-100);
+  flex-shrink: 0;
+}
+.tv-bcol-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tv-bcol-dot-warning { background: var(--tv-icon-warning); }
+.tv-bcol-dot-info    { background: var(--tv-icon-selected); }
+.tv-bcol-dot-muted   { background: var(--tv-icon-off); }
+.tv-bcol-dot-success { background: var(--tv-text-success); }
+.tv-bcol-dot-danger    { background: var(--tv-icon-danger); }
+.tv-bcol-dot-highlight { background: var(--tv-fill-highlight); }
+.tv-bcol-dot-pink      { background: var(--tv-avatar-mc-fg); }
+.tv-bcol-title {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--tv-text-primary);
+}
+.tv-bcol-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--tv-sp-075);
+  border-radius: var(--tv-r-circular);
+  background: var(--tv-fill-surface);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--tv-text-secondary);
+}
+
+.tv-bcol-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-100);
+  padding: var(--tv-sp-050) var(--tv-sp-100) var(--tv-sp-150);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.tv-bcard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tv-sp-075);
+  padding: var(--tv-sp-150);
+  border: 1px solid var(--tv-border-mildest);
+  border-radius: var(--tv-r-md);
+  background: var(--tv-fill-surface);
+  box-shadow: var(--tv-shadow-xs);
+  cursor: pointer;
+  transition: border-color 140ms var(--tv-ease), box-shadow 140ms var(--tv-ease);
+}
+.tv-bcard:hover { border-color: var(--tv-border-milder); box-shadow: var(--tv-shadow-md); }
+.tv-bcard:focus-visible { outline: 2px solid var(--tv-text-brand); outline-offset: 2px; }
+
+.tv-bcard-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--tv-sp-075);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--tv-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.tv-bcard-age { margin-left: auto; color: var(--tv-text-placeholder); }
+
+.tv-bcard-title {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--tv-text-primary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tv-bcard-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--tv-sp-100);
+  margin-top: var(--tv-sp-025);
+}
+.tv-bcard-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-075);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--tv-text-secondary);
+}
+.tv-bcard-owner.is-empty { color: var(--tv-text-placeholder); font-weight: 400; }
+
+/* Priority — a small dot + label, colour only on the dot */
+.tv-pri {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tv-sp-050);
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--tv-text-secondary);
+}
+.tv-pri::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+.tv-pri-urgent::before { background: var(--tv-icon-danger); }
+.tv-pri-high::before   { background: var(--tv-icon-warning); }
+.tv-pri-medium::before { background: var(--tv-icon-selected); }
+.tv-pri-low::before    { background: var(--tv-icon-off); }
+
+/* =====================================================================
+   Table view — replaces the four panes when "Table view" is on
+   ================================================================== */
+.tv-root.is-table .tv-body { display: none; }
+.tv-table-wrap[hidden] { display: none; }
+
+.tv-table-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 var(--tv-sp-200) var(--tv-sp-200);
+}
+
+.tv-table {
+  width: 100%;
+  min-width: 1040px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--tv-text-primary);
+}
+
+.tv-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: var(--tv-sp-150) var(--tv-sp-150);
+  border-bottom: 1px solid var(--tv-border-milder);
+  background: var(--tv-fill-surface);
+  font-size: 12px;
+  line-height: 20px;
+  font-weight: 500;
+  letter-spacing: 0.06px;
+  text-align: left;
+  color: var(--tv-text-secondary);
+  white-space: nowrap;
+}
+
+.tv-table td {
+  padding: var(--tv-sp-150);
+  border-bottom: 1px solid var(--tv-border-mildest);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.tv-table tbody tr { cursor: pointer; transition: background 120ms var(--tv-ease); }
+.tv-table tbody tr:hover { background: var(--tv-fill-container); }
+.tv-table tbody tr:focus-visible { outline: 2px solid var(--tv-text-brand); outline-offset: -2px; }
+
+.tv-tcell-id { color: var(--tv-text-secondary); font-size: 12px; font-variant-numeric: tabular-nums; }
+.tv-tcell-subject { font-weight: 600; max-width: 360px; overflow: hidden; text-overflow: ellipsis; }
+.tv-tcell-age { color: var(--tv-text-placeholder); font-size: 12px; }
+
+.tv-tag-neutral { background: var(--tv-fill-container); color: var(--tv-text-secondary); }
+
+/* SLA "Due in" — plain by default, amber when close, red when at risk */
+.tv-due { font-size: 12px; color: var(--tv-text-secondary); font-variant-numeric: tabular-nums; }
+.tv-due.is-soon { color: var(--tv-text-warning); font-weight: 500; }
+.tv-due.is-risk { color: var(--tv-icon-danger); font-weight: 600; }
+.tv-due.is-done { color: var(--tv-text-placeholder); }
+
+/* ---------------------------------------------------------------------
+   AI agent avatars — the four brand marks (Workplace concierge, Software
+   Handler, Ticket Resolver, Knowledge Curator) replace the old coloured
+   chips. The marks carry their own shape and colour, so no circle fill or
+   clipping; the old sparkle / knowledge glyphs inside are hidden. The
+   Slack badge on the 24px conversation avatars still sits on top.
+   ------------------------------------------------------------------ */
+.tv-av-ai,
+.tv-av-kw,
+.tv-av-wc,
+.tv-av-sh {
+  border-radius: 0;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.tv-av-ai { background-image: url("ai-worker.png"); }
+.tv-av-kw { background-image: url("knowledge-worker.png"); }
+.tv-av-wc { background-image: url("workplace-concierge.png"); }
+.tv-av-sh { background-image: url("software-handler.png"); }
+.tv-av-ai .tv-i,
+.tv-av-kw .tv-i,
+.tv-av-sh .tv-i { display: none; }

@@ -1,0 +1,428 @@
+/* ---------------------------------------------------------------------
+   Freshservice prototype shell — standalone CSS, no build step.
+   Values below are hand-copied from the live Dew-based app's design
+   tokens (colors, spacing, radii, font stack) so this looks the same
+   without depending on @freshworks/dew-components or any npm package.
+   ------------------------------------------------------------------ */
+
+:root {
+  /* colors */
+  --color-rail-bg: #eff6ff;          /* app-chrome — same surface as the top bar */
+  --color-bg-app: #f6f7f8;           /* fill-container */
+  --color-bg-surface: #ffffff;       /* fill-surface */
+  --color-bg-hover: #e6e6e6;         /* fill-base */
+  --color-bg-selected: #def0ff;      /* semantic-info-mildest */
+  --color-border-selected: #88beff;  /* semantic-info-mild */
+  --color-border-mild: #eaeef2;      /* boundary-border-mildest */
+  --color-border-divider: #c9d3db;   /* boundary-divider */
+  --color-icon-primary: #2b3640;
+  --color-icon-secondary: #485a68;
+  --color-icon-selected: #003fd2;
+  --color-text-primary: #12334c;
+  --color-text-secondary: #485a68;
+  --color-text-brand: #003fd2;
+  --color-text-placeholder: #8e9dac; /* same as --tv-text-placeholder */
+  --color-text-inverse: #ffffff;     /* text on dark fills */
+  --color-danger: #d92d20;
+
+  /* spacing (4px base unit) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+
+  /* radii */
+  --radius-2xs: 2px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+
+  /* type */
+  /* "Inter" is the web-font name index.html loads from Google Fonts, so it
+     has to sit in the stack for machines without Inter Variable installed
+     locally — otherwise every weight falls back to the system face. */
+  --font-family: "InterVariable", "Inter Variable", "Inter", "SF Pro Display",
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --shadow-xl: 0px 2px 4px 0px rgba(18, 51, 76, 0.05), 0px 2px 18px 0px rgba(18, 51, 76, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-family);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+/* ---------------------------------------------------------------------
+   Shell layout
+   ------------------------------------------------------------------ */
+
+.app-shell {
+  display: flex;
+  /* 100% of html/body (which are 100% tall) rather than 100vh, so the
+     shell fits exactly inside hosts that pad or resize the page. */
+  height: 100%;
+  width: 100%;
+  background: var(--color-bg-app);
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------------
+   Left rail
+   ------------------------------------------------------------------ */
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 64px;
+  flex-shrink: 0;
+  height: 100%;
+  background: var(--color-rail-bg);
+}
+
+.rail-logo {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4) 0;
+  text-decoration: none;
+}
+
+.rail-logo-mark {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+.rail-items {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  overflow-y: auto;
+  padding: var(--space-3);
+}
+
+.rail-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: default;
+}
+
+.rail-item:hover {
+  background: var(--color-bg-hover);
+}
+
+.rail-item svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-icon-secondary);
+}
+
+.rail-item.is-active {
+  background: var(--color-bg-selected);
+  border-color: var(--color-border-selected);
+}
+
+.rail-item.is-active svg {
+  color: var(--color-icon-selected);
+}
+
+.rail-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-3);
+}
+
+.rail-divider {
+  width: 24px;
+  height: 1px;
+  background: var(--color-border-mild);
+}
+
+.rail-switcher {
+  display: flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.rail-switcher:hover {
+  background: var(--color-bg-hover);
+}
+
+.switcher-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  width: 18px;
+  height: 18px;
+}
+
+.switcher-grid span:nth-child(1) { background: #56d4ac; }
+.switcher-grid span:nth-child(2) { background: #47d3e9; }
+.switcher-grid span:nth-child(3) { background: #f9b705; }
+.switcher-grid span:nth-child(4) { background: #e54b3b; }
+.switcher-grid span {
+  border-radius: 2px;
+}
+
+/* ---------------------------------------------------------------------
+   Top bar
+   ------------------------------------------------------------------ */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  flex-shrink: 0;
+  padding: 0 var(--space-6);
+  background: var(--color-rail-bg);
+  gap: var(--space-4);
+}
+
+.top-bar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.nav-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--color-icon-primary);
+}
+
+.nav-toggle span:nth-child(1) { width: 100%; }
+.nav-toggle span:nth-child(2) { width: 100%; }
+.nav-toggle span:nth-child(3) { width: 64%; }
+
+.view-name {
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.count-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  /* Dark grey fill with white text so the count stands out from the
+     pale-blue top bar. Uses the system's secondary slate (#485a68),
+     about 7:1 contrast with white. */
+  background: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-inverse);
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 32px;
+  width: 380px;
+  max-width: 100%;
+  min-width: 120px;
+  padding: 0 var(--space-2);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-mild);
+  border-radius: var(--radius-md);
+}
+
+.search-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--color-icon-primary);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-text-primary);
+}
+
+.search-input::placeholder { color: var(--color-text-placeholder); }
+
+.search-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: var(--radius-xs);
+  background: var(--color-bg-app);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.btn-create {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-mild);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  cursor: default;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.btn-create svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-icon-secondary);
+}
+
+.top-bar-icons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  color: var(--color-icon-secondary);
+}
+
+.badge-dot {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  border: 1.5px solid var(--color-bg-surface);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-bg-selected);
+  color: var(--color-text-brand);
+  font-size: 13px;
+  font-weight: var(--font-weight-semibold);
+  border: none;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------------
+   Main container — the blank canvas
+   ------------------------------------------------------------------ */
+
+.main-container {
+  flex: 1;
+  min-height: 0;
+  margin: 0 8px 0 0;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-mild);
+  border-radius: var(--radius-lg);
+}
